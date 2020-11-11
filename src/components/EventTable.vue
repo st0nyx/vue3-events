@@ -25,7 +25,7 @@
           {{ event.published }}
         </td>
         <td>
-          <button @click="event.published = !event.published">
+          <button @click="toggleEvents(event)">
             Toggle Published
           </button>
         </td>
@@ -36,89 +36,26 @@
 
 <script>
 import { ref } from "vue";
+import axios from "axios";
+
 export default {
   async setup() {
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // await new Promise(resolve => setTimeout(resolve, 3000));
+    let { data: events } = await axios.get("http://localhost:3000/events");
     return {
-      events: ref([
-        {
-          id: 1,
-          title: "Beach Cleanup",
-          date: "Aug 28 2018",
-          time: "10:00",
-          location: "Daytona Beach, South Beach Road",
-          description: "Let's clean up this beach and do some good.",
-          organizer: "Adam Jahr",
-          category: "sustainability",
-          published: true,
-          attendees: [
-            {
-              id: "abc123",
-              name: "Adam Jahr"
-            },
-            {
-              id: "def456",
-              name: "Gregg Pollack"
-            },
-            {
-              id: "ghi789",
-              name: "Beth Swanson"
-            },
-            {
-              id: "jkl101",
-              name: "Mary Gordon"
-            }
-          ]
-        },
-        {
-          id: 2,
-          title: "Park Cleanup",
-          date: "Nov 12 2018",
-          time: "12:00",
-          location: "132 N Magnolia Street, Orlando, Florida",
-          description: "We're going to clean up this park.",
-          organizer: "Adam Jahr",
-          category: "nature",
-          published: true,
-          attendees: [
-            {
-              id: "ghi789",
-              name: "Beth Swanson"
-            },
-            {
-              id: "jkl101",
-              name: "Mary Gordon"
-            }
-          ]
-        },
-        {
-          id: 3,
-          title: "Pet Adoption Day",
-          date: "Dec 2 2018",
-          time: "12:00",
-          location: "132 N Magnolia Street, Orlando, Florida",
-          description: "Help animals find new homes.",
-          organizer: "Gregg Pollack",
-          category: "animal welfare",
-          published: true,
-          attendees: [
-            {
-              id: "abc123",
-              name: "Adam Jahr"
-            },
-            {
-              id: "ghi789",
-              name: "Beth Swanson"
-            },
-            {
-              id: "jkl101",
-              name: "Mary Gordon"
-            }
-          ]
-        }
-      ])
+      events: ref(events)
     };
   },
+  methods: {
+    toggleEvents(event) {
+      event.published = !event.published;
+      this.updateEvent(event);
+    },
+    updateEvent(event) {
+      axios.put(`http://localhost:3000/events/${event.id}`, event);
+    }
+  },
+
   computed: {
     publishedEvents() {
       return this.events.filter(e => e.published);
