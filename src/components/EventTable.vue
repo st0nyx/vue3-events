@@ -36,23 +36,24 @@
 
 <script>
 import { ref } from "vue";
-import axios from "axios";
+import EventService from "@/services/EventService";
 
 export default {
   async setup() {
-    // await new Promise(resolve => setTimeout(resolve, 3000));
-    let { data: events } = await axios.get("http://localhost:3000/events");
+    let { data: events } = await EventService.getEvents();
+
     return {
       events: ref(events)
     };
   },
+
   methods: {
     toggleEvents(event) {
       event.published = !event.published;
       this.updateEvent(event);
     },
-    updateEvent(event) {
-      axios.put(`http://localhost:3000/events/${event.id}`, event);
+    async updateEvent(event) {
+      await EventService.putEvents(event);
     }
   },
 
